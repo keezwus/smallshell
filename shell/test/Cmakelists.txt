@@ -1,0 +1,7 @@
+include(CTest)
+
+add_executable(test_shell
+    test_shell.c
+    test_exarr.c
+)
+
