@@ -53,3 +53,53 @@ char *getPrompt() // free
                         " >",
                         NULL);
 }
+
+char **parseline(char *line) // free
+{
+    char **args = malloc(SSIZE * sizeof(char *));
+    for (int i = 0; i < SSIZE; i++)
+    {
+        args[i] = malloc(SIZE * sizeof(char));
+    }
+    int isStart = 1;
+    int assize = SSIZE;
+    int argc = 0;
+    int asize = SIZE;
+    int arglen = 0;
+    for (int i = 0; line[i] != '\0'; i++)
+    {
+        if (assize - 1 <= argc)
+        {
+            args = extarrchar(args, assize * 2);
+            assize *= 2;
+        }
+        else
+        {
+            if (isStart)
+            {
+                if (isspace(line[i]))
+                    continue;
+                else
+                    isStart = 0;
+            }
+            else
+            {
+                if (isspace(line[i]))
+                {
+                    /* code */
+                }
+
+                if (arglen - 1 <= asize)
+                {
+                    args[argc] = extchar(args[argc], asize * 2);
+                    asize *= 2;
+                }
+                else
+                {
+                    args[argc][arglen] = line[i];
+                    arglen++;
+                }
+            }
+        }
+    }
+}

@@ -16,3 +16,8 @@ char *extchar(char *str, int size) // free
 {
     return (char *)extarr((void *)str, size, sizeof(char));
 }
+
+char **extarrchar(char **arr, int size) // free
+{
+    return (char **)extarr((void *)arr, size, sizeof(char *));
+}
