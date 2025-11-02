@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "termios.h": "c"
+        "termios.h": "c",
+        "readline.h": "c"
     },
 
     "cmake.configureOnOpen": true,

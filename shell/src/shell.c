@@ -2,17 +2,16 @@
 
 int main()
 {
-    // while (1)
-    // {
-    //     char *prompt = getPrompt();
-    //     char *line = readline(prompt);
-        // free(prompt);
+    while (1)
+    {
+        char *prompt = getPrompt();
+        char *line = readline(prompt);
+        free(prompt);
         // char **arg = parseline(line);
         // free(line);
 
         // free(arg);
-    // }
-    printf("Shell started successfully.\n");
+    }
     return 0;
 }
 
@@ -33,7 +32,6 @@ char *getPrompt() // free
         return NULL;
     }
 
-    char prompt[SIZE];
     struct passwd *user = getpwuid(getuid());
     if (user == NULL)
     {
@@ -42,13 +40,16 @@ char *getPrompt() // free
     }
 
     // generate user@hostname aaa/bb/cwd > style prompt
-    strcpy(prompt, user->pw_name);
-    strcat(prompt, "@");
-    strcat(prompt, hostname);
-    strcat(prompt, " ");
-    strcat(prompt, cwd);
-    strcat(prompt, " ");
-    strcat(prompt, ">");
-
-    return strdup(prompt);
+    return betterstrcat(PROMPT_GREEN,
+                        user->pw_name,
+                        PROMPT_RESET,
+                        "@",
+                        PROMPT_BLUE,
+                        hostname,
+                        " ",
+                        PROMPT_YELLOW,
+                        cwd,
+                        PROMPT_RESET,
+                        " >",
+                        NULL);
 }
