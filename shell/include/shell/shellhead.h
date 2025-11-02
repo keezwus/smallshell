@@ -21,3 +21,4 @@ char *getPrompt();                         // free
 char **parseline(char *line);              // free
 char *extchar(char *str, int size);        // free
 char *betterstrcat(const char *str1, ...); // free and end with NULL
+char **extarrchar(char **arr, int size);   // free

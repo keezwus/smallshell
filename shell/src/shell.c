@@ -6,8 +6,16 @@ int main()
     {
         char *prompt = getPrompt();
         char *line = readline(prompt);
+        if (line == NULL)
+        {
+            exit(0);
+        }
         free(prompt);
-        // char **arg = parseline(line);
+        char **arg = parseline(line);
+        for (int i = 0; arg[i] != NULL; i++)
+        {
+            printf("arg[%d]: %s\n", i, arg[i]);
+        }
         // free(line);
 
         // free(arg);
@@ -57,49 +65,63 @@ char *getPrompt() // free
 char **parseline(char *line) // free
 {
     char **args = malloc(SSIZE * sizeof(char *));
-    for (int i = 0; i < SSIZE; i++)
+    int argc = 0, argsize = SSIZE;
+    while (isspace(*line))
+        line++;
+    int inquote = 0;
+    int isstart = 1;
+    for (size_t i = 0; line[i] != '\0'; i++)
     {
-        args[i] = malloc(SIZE * sizeof(char));
-    }
-    int isStart = 1;
-    int assize = SSIZE;
-    int argc = 0;
-    int asize = SIZE;
-    int arglen = 0;
-    for (int i = 0; line[i] != '\0'; i++)
-    {
-        if (assize - 1 <= argc)
+        if (argsize - 2 <= argc)
         {
-            args = extarrchar(args, assize * 2);
-            assize *= 2;
+            args = extarrchar(args, argsize * 2);
+            argsize *= 2;
         }
-        else
+        if (line[i] == '\"')
         {
-            if (isStart)
+            inquote = !inquote;
+            line[i] = '\0';
+            isstart = 1;
+            continue;
+        }
+        if (inquote)
+        {
+            if (isstart)
             {
-                if (isspace(line[i]))
-                    continue;
-                else
-                    isStart = 0;
+                args[argc] = &line[i];
+                argc++;
+                isstart = 0;
+            }
+            continue;
+        }
+        if (!inquote)
+        {
+            if (isspace(line[i]))
+            {
+                line[i] = '\0';
+                isstart = 1;
             }
             else
             {
-                if (isspace(line[i]))
+                if (isstart)
                 {
-                    /* code */
+                    args[argc] = &line[i];
+                    argc++;
+                    isstart = 0;
                 }
+            }
 
-                if (arglen - 1 <= asize)
-                {
-                    args[argc] = extchar(args[argc], asize * 2);
-                    asize *= 2;
-                }
-                else
-                {
-                    args[argc][arglen] = line[i];
-                    arglen++;
-                }
+            if (line[i] == '|' || line[i] == '<' || line[i] == '>')
+            {
+                isstart = 1;
+                args[argc] = malloc(2);
+                args[argc][0] = line[i];
+                args[argc][1] = '\0';
+                argc++;
+                line[i] = '\0';
             }
         }
     }
+    args[argc] = NULL;
+    return args;
 }
