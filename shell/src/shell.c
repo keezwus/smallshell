@@ -6,19 +6,18 @@ int main()
     {
         char *prompt = getPrompt();
         char *line = readline(prompt);
+        add_history(line);
         if (line == NULL)
         {
             exit(0);
         }
         free(prompt);
         char **arg = parseline(line);
-        for (int i = 0; arg[i] != NULL; i++)
-        {
-            printf("arg[%d]: %s\n", i, arg[i]);
-        }
-        // free(line);
 
-        // free(arg);
+        eval(arg);
+
+        free(line);
+        free(arg);
     }
     return 0;
 }
@@ -111,7 +110,7 @@ char **parseline(char *line) // free
                 }
             }
 
-            if (line[i] == '|' || line[i] == '<' || line[i] == '>')
+            if (line[i] == '|' || line[i] == '<' || line[i] == '>' || line[i] == '&')
             {
                 isstart = 1;
                 args[argc] = malloc(2);
@@ -124,4 +123,38 @@ char **parseline(char *line) // free
     }
     args[argc] = NULL;
     return args;
+}
+
+void eval(char **args)
+{
+    if (args[0] == NULL)
+    {
+        return;
+    }
+    if (strcmp(args[0], "exit") == 0)
+    {
+        exit(0);
+    }
+    else
+    {
+        pid_t pid = fork();
+        if (pid < 0)
+        {
+            perror("ForkErr");
+            return;
+        }
+        else if (pid == 0)
+        {
+            if (execvp(args[0], args) < 0)
+            {
+                perror("ExecErr");
+                exit(EXIT_FAILURE);
+            }
+        }
+        else
+        {
+            int status;
+            waitpid(pid, &status, 0);
+        }
+    }
 }

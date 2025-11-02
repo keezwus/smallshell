@@ -6,6 +6,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <readline/readline.h>
+#include <readline/history.h>
+#include <ctype.h>
+#include <errno.h>
+#include <sys/wait.h>
 #include <stdarg.h>
 
 #define SIZE 128
@@ -22,3 +26,4 @@ char **parseline(char *line);              // free
 char *extchar(char *str, int size);        // free
 char *betterstrcat(const char *str1, ...); // free and end with NULL
 char **extarrchar(char **arr, int size);   // free
+void eval(char **args);
