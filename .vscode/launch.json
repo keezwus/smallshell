@@ -1,34 +1,26 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Debug Shell",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/builds/${fileBasenameNoExtension}",
+            "program": "${command:cmake.launchTargetPath}",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "C/C++: gcc build active file",
-            "miDebuggerArgs": "-q -ex quit; wait() { fg >/dev/null; }; /bin/gdb -q --interpreter=mi",
-            "logging": {
-                "engineLogging": false
-            },
             "setupCommands": [
                 {
-                    "description": "Enable pretty-printing for gdb",
+                    "description": "启用整齐打印",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
-                },
-                {
-                    "description": "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "CMake: Build all",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
-    ],
-    "version": "2.0.0"
+    ]
 }

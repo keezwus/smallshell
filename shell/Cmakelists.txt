@@ -1,8 +1,0 @@
-add_executable(shell 
-    src/shell.c 
-    src/extarr.c
-    )
-
-target_include_directories(shell PUBLIC include)
-
-add_subdirectory(test)

@@ -1,31 +1,18 @@
-// #pragma once
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <readline/readline.h>
-
-#define SIZE 128
-#define SSIZE 16
-
-// function declaration
-char *getPrompt();            // free
-char **parseline(char *line); // free
+#include <shell/shellhead.h>
 
 int main()
 {
-    while (1)
-    {
-        char *prompt = getPrompt();
-        char *line = readline(prompt);
-        free(prompt);
-        char **arg = parseline(line);
-        free(line);
+    // while (1)
+    // {
+    //     char *prompt = getPrompt();
+    //     char *line = readline(prompt);
+        // free(prompt);
+        // char **arg = parseline(line);
+        // free(line);
 
-        free(arg);
-    }
+        // free(arg);
+    // }
+    printf("Shell started successfully.\n");
     return 0;
 }
 
