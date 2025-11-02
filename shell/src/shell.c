@@ -2,6 +2,14 @@
 
 int main()
 {
+    setup_readline();
+
+    if (signal(SIGINT, SIG_IGN) == SIG_ERR)
+        perror("signal error");
+
+    if (signal(SIGCHLD, sigchildHandler) == SIG_ERR)
+        perror("signal error");
+
     while (1)
     {
         char *prompt = getPrompt();
