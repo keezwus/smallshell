@@ -1,10 +1,9 @@
 #include <shell/shellhead.h>
 
-// void sigintHandler(int sig)
-// {
-//     // sigintReceived = 1;
-//     write(STDOUT_FILENO, "\n", 1);
-// }
+void sigintHandler(int sig)
+{
+    write(STDOUT_FILENO, "\n", 1);
+}
 
 void sigchildHandler(int sig)
 {
