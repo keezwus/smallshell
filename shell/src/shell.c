@@ -135,58 +135,18 @@ char **parseline(char *line) // free
 
 void eval(char **args)
 {
-    if (args[0] == NULL)
+    int bg = 0;
+    for (int i = 0; args[i] != NULL; i++)
     {
-        return;
-    }
-    if (strcmp(args[0], "exit") == 0)
-    {
-        exit(0);
-    }
-    if (strcmp(args[0], "cd") == 0)
-    {
-        if (chdir(args[1]) == -1)
+        if (strcmp(args[i], "&") == 0)
         {
-            perror("chdirErr");
+            bg = 1;
+            args[i] = NULL;
+            break;
         }
-        return;
     }
-    if (strcmp(args[0], "pwd") == 0)
-    {
-        char cwd[SIZE];
-        if (getcwd(cwd, sizeof(cwd)) == NULL)
-        {
-            perror("getCwdErr");
-        }
-        else
-        {
-            printf("%s\n", cwd);
-        }
-        return;
-    }
-    if (strcmp(args[0], "echo") == 0)
-    {
-        for (int i = 1; args[i] != NULL; i++)
-        {
-            printf("%s ", args[i]);
-        }
-        printf("\n");
-        return;
-    }
-    if (strcmp(args[0], "kill") == 0)
-    {
-        if (args[1] == NULL)
-        {
-            fprintf(stderr, "kill: missing pid\n");
-            return;
-        }
-        else if (kill(atoi(args[1]), SIGKILL) == -1)
-        {
-            perror("killErr");
-        }
-        return;
-    }
-    else
+
+    if (!builtinCmd(args))
     {
         pid_t pid = fork();
         if (pid < 0)
@@ -201,6 +161,10 @@ void eval(char **args)
                 perror("ExecErr");
                 exit(EXIT_FAILURE);
             }
+        }
+        else if (bg)
+        {
+            return;
         }
         else
         {

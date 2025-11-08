@@ -3,7 +3,8 @@
         "termios.h": "c",
         "readline.h": "c",
         "string.h": "c",
-        "shellhead.h": "c"
+        "shellhead.h": "c",
+        "betterarr.h": "c"
     },
 
     "cmake.configureOnOpen": true,

@@ -1,4 +1,27 @@
-#include <shell/shellhead.h>
+#include <shell/betterarr.h>
+
+static void *extarr(void *ptr, int arrsize, int itemsize)
+{
+    void *newptr = realloc(ptr, arrsize * itemsize);
+    if (newptr == NULL)
+    {
+        free(ptr);
+        exit(EXIT_FAILURE);
+    }
+    return newptr;
+}
+
+char *extchar(char *str, int size) // free
+{
+    return (char *)extarr((void *)str, size, sizeof(char));
+}
+
+char **extarrchar(char **arr, int size) // free
+{
+    return (char **)extarr((void *)arr, size, sizeof(char *));
+}
+
+// void btarrAdd
 
 char *betterstrcat(const char *str1, ...)
 {
@@ -18,7 +41,6 @@ char *betterstrcat(const char *str1, ...)
     char *result = (char *)malloc(totLen + 1);
     if (result == NULL)
     {
-        perror("malloc failed in betterstrcat");
         exit(EXIT_FAILURE);
     }
 

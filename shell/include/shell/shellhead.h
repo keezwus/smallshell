@@ -1,6 +1,5 @@
 #pragma once
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <pwd.h>
 #include <sys/types.h>
@@ -10,8 +9,8 @@
 #include <ctype.h>
 #include <errno.h>
 #include <sys/wait.h>
-#include <stdarg.h>
 #include <signal.h>
+#include <shell/betterarr.h>
 
 #define SIZE 128
 #define SSIZE 16
@@ -22,12 +21,10 @@
 #define PROMPT_RESET "\033[0m"
 
 // function declaration
-char *getPrompt();                         // free
-char **parseline(char *line);              // free
-char *extchar(char *str, int size);        // free
-char *betterstrcat(const char *str1, ...); // free and end with NULL
-char **extarrchar(char **arr, int size);   // free
+char *getPrompt();            // free
+char **parseline(char *line); // free
 void eval(char **args);
 void sigintHandler(int sig);
 void setup_readline();
 void sigchildHandler(int sig);
+int builtinCmd(char **args);
