@@ -32,6 +32,11 @@ static void extbtrchar(btrchar *bptr) // free
     bptr->a = extarr(bptr->a, bptr->s, sizeof(char));
 }
 
+static void extbtrint(btrint *bptr) // free
+{
+    bptr->a = extarr(bptr->a, bptr->s, sizeof(int));
+}
+
 // btrinit
 btrchar btrcharinit()
 {
@@ -50,6 +55,19 @@ btrptr btrptrinit()
 {
     btrptr bptr;
     bptr.a = (void **)malloc(LENGTH * sizeof(void *));
+    if (bptr.a == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+    bptr.s = LENGTH;
+    bptr.c = 0;
+    return bptr;
+}
+
+btrint btrintinit()
+{
+    btrint bptr;
+    bptr.a = (int *)malloc(LENGTH * sizeof(int));
     if (bptr.a == NULL)
     {
         exit(EXIT_FAILURE);
@@ -79,6 +97,17 @@ void btrptradd(btrptr *bptr, void *p)
         bptr->s *= 2;
     }
     bptr->a[bptr->c] = p;
+    bptr->c++;
+}
+
+void btrintadd(btrint *bptr, int val)
+{
+    if (bptr->c >= bptr->s)
+    {
+        extbtrint(bptr);
+        bptr->s *= 2;
+    }
+    bptr->a[bptr->c] = val;
     bptr->c++;
 }
 

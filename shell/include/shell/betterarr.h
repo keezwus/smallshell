@@ -25,5 +25,13 @@ struct btrptr
     int c;
 };
 
+struct btrint
+{
+    int *a;
+    int s;
+    int c;
+};
+
 typedef struct btrchar btrchar;
 typedef struct btrptr btrptr;
+typedef struct btrint btrint;
