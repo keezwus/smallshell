@@ -81,7 +81,7 @@ char **parseline(char *line) // free
     {
         if (argsize - 2 <= argc)
         {
-            args = extarrchar(args, argsize * 2);
+            args = extarrchar(args, argsize);
             argsize *= 2;
         }
         if (line[i] == '\"')

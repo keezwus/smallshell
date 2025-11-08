@@ -1,8 +1,8 @@
 #include <shell/betterarr.h>
 
-static void *extarr(void *ptr, int arrsize, int itemsize)
+static void *extarr(void *ptr, int currentSize, int itemsize)
 {
-    void *newptr = realloc(ptr, arrsize * itemsize);
+    void *newptr = realloc(ptr, 2 * currentSize * itemsize);
     if (newptr == NULL)
     {
         free(ptr);
@@ -11,6 +11,7 @@ static void *extarr(void *ptr, int arrsize, int itemsize)
     return newptr;
 }
 
+// extpart
 char *extchar(char *str, int size) // free
 {
     return (char *)extarr((void *)str, size, sizeof(char));
@@ -19,6 +20,66 @@ char *extchar(char *str, int size) // free
 char **extarrchar(char **arr, int size) // free
 {
     return (char **)extarr((void *)arr, size, sizeof(char *));
+}
+
+static void extbtrptr(btrptr *bptr) // free
+{
+    bptr->a = extarr(bptr->a, bptr->s, sizeof(void *));
+}
+
+static void extbtrchar(btrchar *bptr) // free
+{
+    bptr->a = extarr(bptr->a, bptr->s, sizeof(char));
+}
+
+// btrinit
+btrchar btrcharinit()
+{
+    btrchar bptr;
+    bptr.a = (char *)malloc(LENGTH * sizeof(char));
+    if (bptr.a == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+    bptr.s = LENGTH;
+    bptr.c = 0;
+    return bptr;
+}
+
+btrptr btrptrinit()
+{
+    btrptr bptr;
+    bptr.a = (void **)malloc(LENGTH * sizeof(void *));
+    if (bptr.a == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+    bptr.s = LENGTH;
+    bptr.c = 0;
+    return bptr;
+}
+
+// btradd
+void btrcharadd(btrchar *bptr, char c)
+{
+    if (bptr->c >= bptr->s)
+    {
+        extbtrchar(bptr);
+        bptr->s *= 2;
+    }
+    bptr->a[bptr->c] = c;
+    bptr->c++;
+}
+
+void btrptradd(btrptr *bptr, void *p)
+{
+    if (bptr->c >= bptr->s)
+    {
+        extbtrptr(bptr);
+        bptr->s *= 2;
+    }
+    bptr->a[bptr->c] = p;
+    bptr->c++;
 }
 
 // void btarrAdd
