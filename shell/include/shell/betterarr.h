@@ -11,6 +11,13 @@ char *betterstrcat(const char *str1, ...); // free and end with NULL
 
 // size for s and count for c
 // note that count c is the number of used elements
+struct btrgeneral
+{
+    void *a;
+    int s;
+    int c;
+};
+
 struct btrchar
 {
     char *a;
@@ -35,3 +42,4 @@ struct btrint
 typedef struct btrchar btrchar;
 typedef struct btrptr btrptr;
 typedef struct btrint btrint;
+typedef struct btrgeneral btrgeneral;

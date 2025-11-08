@@ -38,43 +38,30 @@ static void extbtrint(btrint *bptr) // free
 }
 
 // btrinit
-btrchar btrcharinit()
+static void btrinit(btrgeneral *bptr, int itemsize)
 {
-    btrchar bptr;
-    bptr.a = (char *)malloc(LENGTH * sizeof(char));
-    if (bptr.a == NULL)
+    bptr->a = malloc(LENGTH * itemsize);
+    if (bptr->a == NULL)
     {
         exit(EXIT_FAILURE);
     }
-    bptr.s = LENGTH;
-    bptr.c = 0;
-    return bptr;
+    bptr->s = LENGTH;
+    bptr->c = 0;
 }
 
-btrptr btrptrinit()
+void btrcharinit(btrchar *bptr)
 {
-    btrptr bptr;
-    bptr.a = (void **)malloc(LENGTH * sizeof(void *));
-    if (bptr.a == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    bptr.s = LENGTH;
-    bptr.c = 0;
-    return bptr;
+    btrinit((btrgeneral *)bptr, sizeof(char));
 }
 
-btrint btrintinit()
+void btrptrinit(btrptr *bptr)
 {
-    btrint bptr;
-    bptr.a = (int *)malloc(LENGTH * sizeof(int));
-    if (bptr.a == NULL)
-    {
-        exit(EXIT_FAILURE);
-    }
-    bptr.s = LENGTH;
-    bptr.c = 0;
-    return bptr;
+    btrinit((btrgeneral *)bptr, sizeof(void *));
+}
+
+void btrintinit(btrint *bptr)
+{
+    btrinit((btrgeneral *)bptr, sizeof(int));
 }
 
 // btradd

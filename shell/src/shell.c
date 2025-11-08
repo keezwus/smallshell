@@ -1,8 +1,12 @@
 #include <shell/shellhead.h>
 
+// global variable
+
 int main()
 {
     setup_readline();
+    btrint jobs;
+    btrintinit(&jobs);
 
     if (signal(SIGINT, sigintHandler) == SIG_ERR)
         perror("signal error");
