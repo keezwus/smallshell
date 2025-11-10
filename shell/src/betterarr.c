@@ -98,8 +98,40 @@ void btrintadd(btrint *bptr, int val)
     bptr->c++;
 }
 
-// void btarrAdd
+// btrdel
+static void btrdel(btrgeneral *bptr, int index, int itemsize)
+{
+    if (index < 0 || index >= bptr->c)
+    {
+        return;
+    }
+    if (index == bptr->c - 1)
+    {
+        bptr->c--;
+        return;
+    }
+    memmove((char *)bptr->a + index * itemsize,
+            (char *)bptr->a + (index + 1) * itemsize,
+            (bptr->c - index - 1) * itemsize);
+    bptr->c--;
+}
 
+void btrchardel(btrchar *bptr, int index)
+{
+    btrdel((btrgeneral *)bptr, index, sizeof(char));
+}
+
+void btrptrdel(btrptr *bptr, int index)
+{
+    btrdel((btrgeneral *)bptr, index, sizeof(void *));
+}
+
+void btrintdel(btrint *bptr, int index)
+{
+    btrdel((btrgeneral *)bptr, index, sizeof(int));
+}
+
+// betterstrcat
 char *betterstrcat(const char *str1, ...)
 {
     va_list args;
