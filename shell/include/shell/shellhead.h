@@ -20,6 +20,9 @@
 #define PROMPT_RED "\033[31m"
 #define PROMPT_RESET "\033[0m"
 
+// global variable
+extern btrint jobs;
+
 // function declaration
 char *getPrompt();            // free
 char **parseline(char *line); // free

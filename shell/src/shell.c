@@ -1,11 +1,11 @@
 #include <shell/shellhead.h>
 
 // global variable
+btrint jobs;
 
 int main()
 {
     setup_readline();
-    btrint jobs;
     btrintinit(&jobs);
 
     if (signal(SIGINT, sigintHandler) == SIG_ERR)
@@ -168,6 +168,7 @@ void eval(char **args)
         }
         else if (bg)
         {
+            btrintadd(&jobs, pid);
             return;
         }
         else

@@ -59,6 +59,15 @@ int builtinCmd(char **args)
         }
         return 1;
     }
+    if (!strcmp(args[0], "jobs"))
+    {
+        for (int i = 0; i < jobs.c; i++)
+        {
+            printf("jobs%d pid:%d\n", i, jobs.a[i]);
+        }
+        return 1;
+    }
+
     if (strcmp(args[0], "&") == 0)
     {
         return 1;

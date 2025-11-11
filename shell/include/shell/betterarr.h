@@ -5,10 +5,6 @@
 
 #define LENGTH 16
 
-char *extchar(char *str, int size);        // free
-char **extarrchar(char **arr, int size);   // free
-char *betterstrcat(const char *str1, ...); // free and end with NULL
-
 // size for s and count for c
 // note that count c is the number of used elements
 struct btrgeneral
@@ -43,3 +39,25 @@ typedef struct btrchar btrchar;
 typedef struct btrptr btrptr;
 typedef struct btrint btrint;
 typedef struct btrgeneral btrgeneral;
+
+// extend array functions
+char *extchar(char *str, int size);
+char **extarrchar(char **arr, int size);
+
+// initialize functions
+void btrcharinit(btrchar *bptr);
+void btrptrinit(btrptr *bptr);
+void btrintinit(btrint *bptr);
+
+// add element functions
+void btrcharadd(btrchar *bptr, char c);
+void btrptradd(btrptr *bptr, void *p);
+void btrintadd(btrint *bptr, int val);
+
+// delete element functions
+void btrchardel(btrchar *bptr, int index);
+void btrptrdel(btrptr *bptr, int index);
+void btrintdel(btrint *bptr, int index);
+
+// string concatenation function
+char *betterstrcat(const char *str1, ...);
