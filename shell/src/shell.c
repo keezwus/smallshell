@@ -7,6 +7,7 @@ int main()
 {
     setup_readline();
     btrintinit(&jobs);
+    btrintadd(&jobs, 0); // placeholder for foreground process
 
     if (signal(SIGINT, sigintHandler) == SIG_ERR)
         perror("signal error");
@@ -160,6 +161,7 @@ void eval(char **args)
         }
         else if (pid == 0)
         {
+            setpgid(0, 0); // set child process group id to its own pid
             if (execvp(args[0], args) < 0)
             {
                 perror("ExecErr");
@@ -173,6 +175,7 @@ void eval(char **args)
         }
         else
         {
+            jobs.a[0] = pid;
             int status;
             waitpid(pid, &status, 0);
         }

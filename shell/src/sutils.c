@@ -63,7 +63,7 @@ int builtinCmd(char **args)
     {
         for (int i = 0; i < jobs.c; i++)
         {
-            printf("jobs%d pid:%d\n", i, jobs.a[i]);
+            printf("jobs%d pgid:%d\n", i, jobs.a[i]);
         }
         return 1;
     }

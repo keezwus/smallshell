@@ -2,6 +2,11 @@
 
 void sigintHandler(int sig)
 {
+    if (jobs.a[0] != 0)
+    {
+        killpg(jobs.a[0], SIGINT);
+        jobs.a[0] = 0;
+    }
     write(STDOUT_FILENO, "\n", 1);
 }
 
