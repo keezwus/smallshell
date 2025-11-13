@@ -151,6 +151,17 @@ void eval(char **args)
         }
     }
 
+    btrint btrArgcFEC;
+    btrintinit(&btrArgcFEC);
+    for (size_t i = 0; args[i] != NULL; i++)
+    {
+        if (args[i] == '|')
+        {
+            /* code */
+            execlp
+        }
+    }
+
     if (!builtinCmd(args))
     {
         pid_t pid = fork();
@@ -180,4 +191,7 @@ void eval(char **args)
             waitpid(pid, &status, 0);
         }
     }
+
+    // remember to free memory
+    free(btrArgcFEC.a);
 }

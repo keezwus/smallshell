@@ -31,3 +31,4 @@ void sigintHandler(int sig);
 void setup_readline();
 void sigchildHandler(int sig);
 int builtinCmd(char **args);
+void executeCmd(char **args, int *argcFEC); // argcFEC == argcForEveryCommand
