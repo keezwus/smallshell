@@ -151,17 +151,6 @@ void eval(char **args)
         }
     }
 
-    // btrint btrArgcFEC;
-    // btrintinit(&btrArgcFEC);
-    // for (size_t i = 0; args[i] != NULL; i++)
-    // {
-    //     if (args[i] == '|')
-    //     {
-    //         /* code */
-    //         execlp
-    //     }
-    // }
-
     if (!builtinCmd(args))
     {
         pid_t pid = fork();
@@ -191,9 +180,6 @@ void eval(char **args)
             waitpid(pid, &status, 0);
         }
     }
-
-    // remember to free memory
-    // free(btrArgcFEC.a);
 }
 
 int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
@@ -244,14 +230,3 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     close(oldStdin);
     close(oldStdout);
 }
-
-// void setFd(int inFd,int outFd) //Fd minus zero means restore to the Fd before last redirection
-// {
-//     //save original stdin and stdout and redirect
-//     static int oldStdin = dup(STDIN_FILENO);
-//     static int oldStdout = dup(STDOUT_FILENO);
-//     dup2(inFd, STDIN_FILENO);
-//     dup2(outFd, STDOUT_FILENO);
-//     close(inFd);
-//     close(outFd);
-// }
