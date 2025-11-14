@@ -4,7 +4,8 @@
         "readline.h": "c",
         "string.h": "c",
         "shellhead.h": "c",
-        "betterarr.h": "c"
+        "betterarr.h": "c",
+        "fcntl.h": "c"
     },
 
     "cmake.configureOnOpen": true,

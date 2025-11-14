@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <shell/betterarr.h>
+#include <fcntl.h>
 
 #define SIZE 128
 #define SSIZE 16
@@ -32,3 +33,4 @@ void setup_readline();
 void sigchildHandler(int sig);
 int builtinCmd(char **args);
 int execCmd(char **args, int pgid, int inFd, int outFd); // return 0 for builtin, positive for forked pid
+void pipeworks(char **args);

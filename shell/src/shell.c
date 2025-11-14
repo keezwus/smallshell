@@ -151,35 +151,36 @@ void eval(char **args)
         }
     }
 
-    if (!builtinCmd(args))
-    {
-        pid_t pid = fork();
-        if (pid < 0)
-        {
-            perror("ForkErr");
-            return;
-        }
-        else if (pid == 0)
-        {
-            setpgid(0, 0); // set child process group id to its own pid
-            if (execvp(args[0], args) < 0)
-            {
-                perror("ExecErr");
-                exit(EXIT_FAILURE);
-            }
-        }
-        else if (bg)
-        {
-            btrintadd(&jobs, pid);
-            return;
-        }
-        else
-        {
-            jobs.a[0] = pid;
-            int status;
-            waitpid(pid, &status, 0);
-        }
-    }
+    pipeworks(args);
+    // if (!builtinCmd(args))
+    // {
+    //     pid_t pid = fork();
+    //     if (pid < 0)
+    //     {
+    //         perror("ForkErr");
+    //         return;
+    //     }
+    //     else if (pid == 0)
+    //     {
+    //         setpgid(0, 0); // set child process group id to its own pid
+    //         if (execvp(args[0], args) < 0)
+    //         {
+    //             perror("ExecErr");
+    //             exit(EXIT_FAILURE);
+    //         }
+    //     }
+    //     else if (bg)
+    //     {
+    //         btrintadd(&jobs, pid);
+    //         return;
+    //     }
+    //     else
+    //     {
+    //         jobs.a[0] = pid;
+    //         int status;
+    //         waitpid(pid, &status, 0);
+    //     }
+    // }
 }
 
 int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
@@ -229,4 +230,60 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     dup2(oldStdout, STDOUT_FILENO);
     close(oldStdin);
     close(oldStdout);
+}
+
+void pipeworks(char **args)
+{
+    btrint sessions; // records starting index of each command
+    btrintinit(&sessions);
+    btrintadd(&sessions, 0);
+
+    btrint pipes; // records pipe fds
+    btrintinit(&pipes);
+    btrintadd(&pipes, STDIN_FILENO);
+    btrintadd(&pipes, STDOUT_FILENO);
+    int fd[2];
+
+    for (int i = 0; args[i] != NULL; i++)
+    {
+        if (!strcmp(args[i], "|"))
+        {
+            args[i] = NULL;
+            btrintadd(&sessions, i + 1);
+            pipe(fd);
+            btrintins(&pipes, pipes.c - 2, fd[1]); // insert read end before stdout
+            btrintins(&pipes, pipes.c - 2, fd[0]); // insert write end before stdout
+        }
+        else if (!strcmp(args[i], "<"))
+        {
+            args[i] = NULL;
+            fd[1] = open(args[i + 1], O_RDONLY);
+            pipes.a[0] = fd[1];
+            i++;
+        }
+        else if (!strcmp(args[i], ">"))
+        {
+            args[i] = NULL;
+            fd[0] = open(args[i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            pipes.a[pipes.c - 1] = fd[0];
+            i++;
+        }
+    }
+
+    if (sessions.c * 2 != pipes.c)
+    {
+        fprintf(stderr, "pipeworksErr: mismatch number of commands and pipes\n");
+        free(sessions.a);
+        free(pipes.a);
+        return;
+    }
+
+    for (int i = 0; i < sessions.c; i++)
+    {
+        execCmd(args + sessions.a[i], (i == 0) ? 0 : jobs.a[0],
+                pipes.a[i * 2], pipes.a[i * 2 + 1]);
+    }
+
+    free(sessions.a);
+    free(pipes.a);
 }
