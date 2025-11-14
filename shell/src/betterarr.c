@@ -131,6 +131,40 @@ void btrintdel(btrint *bptr, int index)
     btrdel((btrgeneral *)bptr, index, sizeof(int));
 }
 
+// btrinsert
+static void btrins(btrgeneral *bptr, int index, void *value, int itemsize)
+{
+    if (index < 0 || index > bptr->c)
+    {
+        return;
+    }
+    if (bptr->c >= bptr->s)
+    {
+        bptr->a = extarr(bptr->a, bptr->s, itemsize);
+        bptr->s *= 2;
+    }
+    memmove((char *)bptr->a + (index + 1) * itemsize,
+            (char *)bptr->a + index * itemsize,
+            (bptr->c - index) * itemsize);
+    memcpy((char *)bptr->a + index * itemsize, value, itemsize);
+    bptr->c++;
+}
+
+void btrcharins(btrchar *bptr, int index, char c)
+{
+    btrins((btrgeneral *)bptr, index, &c, sizeof(char));
+}
+
+void btrptrins(btrptr *bptr, int index, void *p)
+{
+    btrins((btrgeneral *)bptr, index, &p, sizeof(void *));
+}
+
+void btrintins(btrint *bptr, int index, int val)
+{
+    btrins((btrgeneral *)bptr, index, &val, sizeof(int));
+}
+
 // betterstrcat
 char *betterstrcat(const char *str1, ...)
 {

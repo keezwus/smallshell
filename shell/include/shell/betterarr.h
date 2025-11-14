@@ -59,5 +59,10 @@ void btrchardel(btrchar *bptr, int index);
 void btrptrdel(btrptr *bptr, int index);
 void btrintdel(btrint *bptr, int index);
 
+// insert element functions
+void btrcharins(btrchar *bptr, int index, char c);
+void btrptrins(btrptr *bptr, int index, void *p);
+void btrintins(btrint *bptr, int index, int val);
+
 // string concatenation function
 char *betterstrcat(const char *str1, ...);
