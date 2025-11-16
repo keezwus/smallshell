@@ -151,85 +151,83 @@ void eval(char **args)
         }
     }
 
-    pipeworks(args);
-    // if (!builtinCmd(args))
-    // {
-    //     pid_t pid = fork();
-    //     if (pid < 0)
-    //     {
-    //         perror("ForkErr");
-    //         return;
-    //     }
-    //     else if (pid == 0)
-    //     {
-    //         setpgid(0, 0); // set child process group id to its own pid
-    //         if (execvp(args[0], args) < 0)
-    //         {
-    //             perror("ExecErr");
-    //             exit(EXIT_FAILURE);
-    //         }
-    //     }
-    //     else if (bg)
-    //     {
-    //         btrintadd(&jobs, pid);
-    //         return;
-    //     }
-    //     else
-    //     {
-    //         jobs.a[0] = pid;
-    //         int status;
-    //         waitpid(pid, &status, 0);
-    //     }
-    // }
-}
-
-int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
-{
-    // save original stdin and stdout and redirect
-    int oldStdin = dup(STDIN_FILENO);
-    int oldStdout = dup(STDOUT_FILENO);
-    dup2(inFd, STDIN_FILENO);
-    dup2(outFd, STDOUT_FILENO);
-    close(inFd);
-    close(outFd);
-
+    // pipeworks(args);
+    // waitpid(-1, NULL, 0);
     if (!builtinCmd(args))
     {
         pid_t pid = fork();
         if (pid < 0)
         {
             perror("ForkErr");
-            // restore original stdin and stdout
-            dup2(oldStdin, STDIN_FILENO);
-            dup2(oldStdout, STDOUT_FILENO);
-            close(oldStdin);
-            close(oldStdout);
-            return -1;
+            return;
         }
         else if (pid == 0)
         {
-            setpgid(0, pgid); // set child process group id to the given pgid (0 if initializing)
+            setpgid(0, 0); // set child process group id to its own pid
             if (execvp(args[0], args) < 0)
             {
                 perror("ExecErr");
                 exit(EXIT_FAILURE);
             }
         }
+        else if (bg)
+        {
+            btrintadd(&jobs, pid);
+            return;
+        }
         else
         {
-            // restore original stdin and stdout
-            dup2(oldStdin, STDIN_FILENO);
-            dup2(oldStdout, STDOUT_FILENO);
-            close(oldStdin);
-            close(oldStdout);
-            return pid;
+            jobs.a[0] = pid;
+            int status;
+            waitpid(pid, &status, 0);
         }
     }
-    // restore original stdin and stdout for builtin command
-    dup2(oldStdin, STDIN_FILENO);
-    dup2(oldStdout, STDOUT_FILENO);
-    close(oldStdin);
-    close(oldStdout);
+}
+
+int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
+{
+    if (isBuiltinCmd(args))
+    {
+        // save original stdin and stdout and redirect
+        int oldStdin = dup(STDIN_FILENO);
+        int oldStdout = dup(STDOUT_FILENO);
+        dup2(inFd, STDIN_FILENO);
+        dup2(outFd, STDOUT_FILENO);
+
+        builtinCmd(args);
+
+        dup2(oldStdin, STDIN_FILENO);
+        dup2(oldStdout, STDOUT_FILENO);
+        close(oldStdin);
+        close(oldStdout);
+        close(inFd);
+        close(outFd);
+        return 0;
+    }
+
+    pid_t pid = fork();
+    if (pid == 0)
+    {
+        setpgid(0, pgid); // set child process group id to the given pgid (0 if initializing)
+
+        dup2(inFd, STDIN_FILENO);
+        dup2(outFd, STDOUT_FILENO);
+
+        close(inFd);
+        close(outFd);
+
+        if (execvp(args[0], args) < 0)
+        {
+            perror("ExecErr");
+            exit(EXIT_FAILURE);
+        }
+    }
+    else
+    {
+        close(inFd);
+        close(outFd);
+        return pid;
+    }
 }
 
 void pipeworks(char **args)
@@ -251,8 +249,8 @@ void pipeworks(char **args)
             args[i] = NULL;
             btrintadd(&sessions, i + 1);
             pipe(fd);
-            btrintins(&pipes, pipes.c - 2, fd[1]); // insert read end before stdout
-            btrintins(&pipes, pipes.c - 2, fd[0]); // insert write end before stdout
+            btrintins(&pipes, pipes.c - 1, fd[1]); // insert read end before stdout
+            btrintins(&pipes, pipes.c - 1, fd[0]); // insert write end before stdout
         }
         else if (!strcmp(args[i], "<"))
         {

@@ -74,3 +74,22 @@ int builtinCmd(char **args)
     }
     return 0;
 }
+
+int isBuiltinCmd(char **args)
+{
+    if (args[0] == NULL)
+    {
+        return 1;
+    }
+    if (strcmp(args[0], "exit") == 0 ||
+        strcmp(args[0], "cd") == 0 ||
+        strcmp(args[0], "pwd") == 0 ||
+        strcmp(args[0], "echo") == 0 ||
+        strcmp(args[0], "kill") == 0 ||
+        !strcmp(args[0], "jobs") == 0 ||
+        strcmp(args[0], "&") == 0)
+    {
+        return 1;
+    }
+    return 0;
+}
