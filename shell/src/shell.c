@@ -151,37 +151,37 @@ void eval(char **args)
         }
     }
 
-    // pipeworks(args);
-    // waitpid(-1, NULL, 0);
-    if (!builtinCmd(args))
-    {
-        pid_t pid = fork();
-        if (pid < 0)
-        {
-            perror("ForkErr");
-            return;
-        }
-        else if (pid == 0)
-        {
-            setpgid(0, 0); // set child process group id to its own pid
-            if (execvp(args[0], args) < 0)
-            {
-                perror("ExecErr");
-                exit(EXIT_FAILURE);
-            }
-        }
-        else if (bg)
-        {
-            btrintadd(&jobs, pid);
-            return;
-        }
-        else
-        {
-            jobs.a[0] = pid;
-            int status;
-            waitpid(pid, &status, 0);
-        }
-    }
+    pipeworks(args);
+    waitpid(-1, NULL, 0);
+    // if (!builtinCmd(args))
+    // {
+    //     pid_t pid = fork();
+    //     if (pid < 0)
+    //     {
+    //         perror("ForkErr");
+    //         return;
+    //     }
+    //     else if (pid == 0)
+    //     {
+    //         setpgid(0, 0); // set child process group id to its own pid
+    //         if (execvp(args[0], args) < 0)
+    //         {
+    //             perror("ExecErr");
+    //             exit(EXIT_FAILURE);
+    //         }
+    //     }
+    //     else if (bg)
+    //     {
+    //         btrintadd(&jobs, pid);
+    //         return;
+    //     }
+    //     else
+    //     {
+    //         jobs.a[0] = pid;
+    //         int status;
+    //         waitpid(pid, &status, 0);
+    //     }
+    // }
 }
 
 int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
@@ -189,19 +189,32 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     if (isBuiltinCmd(args))
     {
         // save original stdin and stdout and redirect
-        int oldStdin = dup(STDIN_FILENO);
-        int oldStdout = dup(STDOUT_FILENO);
-        dup2(inFd, STDIN_FILENO);
-        dup2(outFd, STDOUT_FILENO);
+        int oldStdin = -1, oldStdout = -1;
+        if (inFd != STDIN_FILENO)
+        {
+            oldStdin = dup(STDIN_FILENO);
+            dup2(inFd, STDIN_FILENO);
+            close(inFd);
+        }
+        if (outFd != STDOUT_FILENO)
+        {
+            oldStdout = dup(STDOUT_FILENO);
+            dup2(outFd, STDOUT_FILENO);
+            close(outFd);
+        }
 
         builtinCmd(args);
 
-        dup2(oldStdin, STDIN_FILENO);
-        dup2(oldStdout, STDOUT_FILENO);
-        close(oldStdin);
-        close(oldStdout);
-        close(inFd);
-        close(outFd);
+        if (oldStdin != -1)
+        {
+            dup2(oldStdin, STDIN_FILENO);
+            close(oldStdin);
+        }
+        if (oldStdout != -1)
+        {
+            dup2(oldStdout, STDOUT_FILENO);
+            close(oldStdout);
+        }
         return 0;
     }
 
@@ -210,11 +223,16 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     {
         setpgid(0, pgid); // set child process group id to the given pgid (0 if initializing)
 
-        dup2(inFd, STDIN_FILENO);
-        dup2(outFd, STDOUT_FILENO);
-
-        close(inFd);
-        close(outFd);
+        if (inFd != STDIN_FILENO)
+        {
+            dup2(inFd, STDIN_FILENO);
+            close(inFd);
+        }
+        if (outFd != STDOUT_FILENO)
+        {
+            dup2(outFd, STDOUT_FILENO);
+            close(outFd);
+        }
 
         if (execvp(args[0], args) < 0)
         {
@@ -224,8 +242,11 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     }
     else
     {
-        close(inFd);
-        close(outFd);
+        if (inFd != STDIN_FILENO)
+            close(inFd);
+        if (outFd != STDOUT_FILENO)
+            close(outFd);
+
         return pid;
     }
 }
