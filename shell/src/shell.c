@@ -263,6 +263,8 @@ void pipeworks(char **args)
     btrintadd(&pipes, STDOUT_FILENO);
     int fd[2];
 
+    int pgid;
+
     for (int i = 0; args[i] != NULL; i++)
     {
         if (!strcmp(args[i], "|"))
@@ -299,8 +301,16 @@ void pipeworks(char **args)
 
     for (int i = 0; i < sessions.c; i++)
     {
-        execCmd(args + sessions.a[i], (i == 0) ? 0 : jobs.a[0],
-                pipes.a[i * 2], pipes.a[i * 2 + 1]);
+        if (i == 0)
+        {
+            pgid = execCmd(args + sessions.a[i], (i == 0) ? 0 : jobs.a[0],
+                           pipes.a[i * 2], pipes.a[i * 2 + 1]);
+        }
+        else
+        {
+            execCmd(args + sessions.a[i], (i == 0) ? 0 : jobs.a[0],
+                    pipes.a[i * 2], pipes.a[i * 2 + 1]);
+        }
     }
 
     free(sessions.a);
