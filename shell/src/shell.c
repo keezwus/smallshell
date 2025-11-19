@@ -140,6 +140,7 @@ char **parseline(char *line) // free
 void eval(char **args)
 {
     int bg = 0;
+    int pgid;
     for (int i = 0; args[i] != NULL; i++)
     {
         if (strcmp(args[i], "&") == 0)
@@ -150,37 +151,17 @@ void eval(char **args)
         }
     }
 
-    pipeworks(args);
-    waitpid(-1, NULL, 0);
-    // if (!builtinCmd(args))
-    // {
-    //     pid_t pid = fork();
-    //     if (pid < 0)
-    //     {
-    //         perror("ForkErr");
-    //         return;
-    //     }
-    //     else if (pid == 0)
-    //     {
-    //         setpgid(0, 0); // set child process group id to its own pid
-    //         if (execvp(args[0], args) < 0)
-    //         {
-    //             perror("ExecErr");
-    //             exit(EXIT_FAILURE);
-    //         }
-    //     }
-    //     else if (bg)
-    //     {
-    //         btrintadd(&jobs, pid);
-    //         return;
-    //     }
-    //     else
-    //     {
-    //         jobs.a[0] = pid;
-    //         int status;
-    //         waitpid(pid, &status, 0);
-    //     }
-    // }
+    pgid = pipeworks(args);
+    if (bg)
+    {
+        btrintadd(&jobs, pgid);
+        return;
+    }
+    else
+    {
+        jobs.a[0] = pgid;
+        waitpid(-pgid, NULL, 0);
+    }
 }
 
 int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
@@ -246,7 +227,7 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     }
 }
 
-void pipeworks(char **args)
+int pipeworks(char **args)
 {
     btrint sessions; // records starting index of each command
     btrintinit(&sessions);
@@ -291,7 +272,7 @@ void pipeworks(char **args)
         fprintf(stderr, "pipeworksErr: mismatch number of commands and pipes\n");
         free(sessions.a);
         free(pipes.a);
-        return;
+        return -1;
     }
 
     for (int i = 0; i < sessions.c; i++)
@@ -307,7 +288,7 @@ void pipeworks(char **args)
                     pipes.a[i * 2], pipes.a[i * 2 + 1]);
         }
     }
-
     free(sessions.a);
     free(pipes.a);
+    return pgid;
 }

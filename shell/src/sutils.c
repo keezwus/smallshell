@@ -63,8 +63,16 @@ int builtinCmd(char **args)
     {
         for (int i = 0; i < jobs.c; i++)
         {
+            if (!isProcessGroupAlive(jobs.a[i]))
+            {
+                // remove from jobs
+                btrintdel(&jobs, i);
+                i--;
+                continue;
+            }
             printf("jobs%d pgid:%d\n", i, jobs.a[i]);
         }
+
         return 1;
     }
 
@@ -92,4 +100,16 @@ int isBuiltinCmd(char **args)
         return 1;
     }
     return 0;
+}
+
+int isProcessGroupAlive(int pgid)
+{
+    if (killpg(pgid, 0) == -1)
+    {
+        if (errno == ESRCH)
+        {
+            return 0; // process group does not exist
+        }
+    }
+    return 1; // process group exists
 }
