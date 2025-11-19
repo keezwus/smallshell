@@ -86,7 +86,7 @@ int isBuiltinCmd(char **args)
         strcmp(args[0], "pwd") == 0 ||
         strcmp(args[0], "echo") == 0 ||
         strcmp(args[0], "kill") == 0 ||
-        !strcmp(args[0], "jobs") == 0 ||
+        strcmp(args[0], "jobs") == 0 ||
         strcmp(args[0], "&") == 0)
     {
         return 1;
