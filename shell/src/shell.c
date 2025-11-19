@@ -113,6 +113,15 @@ char **parseline(char *line) // free
                 line[i] = '\0';
                 isstart = 1;
             }
+            else if (line[i] == '|' || line[i] == '<' || line[i] == '>' || line[i] == '&')
+            {
+                isstart = 1;
+                args[argc] = malloc(2);
+                args[argc][0] = line[i];
+                args[argc][1] = '\0';
+                argc++;
+                line[i] = '\0';
+            }
             else
             {
                 if (isstart)
@@ -121,16 +130,6 @@ char **parseline(char *line) // free
                     argc++;
                     isstart = 0;
                 }
-            }
-
-            if (line[i] == '|' || line[i] == '<' || line[i] == '>' || line[i] == '&')
-            {
-                isstart = 1;
-                args[argc] = malloc(2);
-                args[argc][0] = line[i];
-                args[argc][1] = '\0';
-                argc++;
-                line[i] = '\0';
             }
         }
     }
@@ -234,11 +233,7 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
             close(outFd);
         }
 
-        if (execvp(args[0], args) < 0)
-        {
-            perror("ExecErr");
-            exit(EXIT_FAILURE);
-        }
+        execvp(args[0], args);
     }
     else
     {
