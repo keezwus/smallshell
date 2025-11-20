@@ -116,7 +116,7 @@ char **parseline(char *line) // free
             else if (line[i] == '|' || line[i] == '<' || line[i] == '>' || line[i] == '&')
             {
                 isstart = 1;
-                args[argc] = malloc(2);
+                args[argc] = malloc(2); // leak a little, but is a little so probably fine
                 args[argc][0] = line[i];
                 args[argc][1] = '\0';
                 argc++;
@@ -139,8 +139,12 @@ char **parseline(char *line) // free
 
 void eval(char **args)
 {
+    if (args[0] == NULL)
+    {
+        return;
+    }
+
     int bg = 0;
-    int pgid;
     for (int i = 0; args[i] != NULL; i++)
     {
         if (strcmp(args[i], "&") == 0)
@@ -150,8 +154,9 @@ void eval(char **args)
             break;
         }
     }
+    jobs.a[0] = -1;
 
-    pgid = pipeworks(args);
+    int pgid = pipeworks(args);
     if (bg)
     {
         btrintadd(&jobs, pgid);
@@ -159,8 +164,11 @@ void eval(char **args)
     }
     else
     {
+        if (waitpid(-pgid, NULL, 0) == -1)
+        {
+            perror("waitpidErr");
+        }
         jobs.a[0] = pgid;
-        waitpid(-pgid, NULL, 0);
     }
 }
 
@@ -245,7 +253,7 @@ int pipeworks(char **args)
     btrintadd(&pipes, STDOUT_FILENO);
     int fd[2];
 
-    int pgid;
+    int pgid = 0;
 
     for (int i = 0; args[i] != NULL; i++)
     {
@@ -285,12 +293,12 @@ int pipeworks(char **args)
     {
         if (i == 0)
         {
-            pgid = execCmd(args + sessions.a[i], (i == 0) ? 0 : jobs.a[0],
+            pgid = execCmd(args + sessions.a[i], 0,
                            pipes.a[i * 2], pipes.a[i * 2 + 1]);
         }
         else
         {
-            execCmd(args + sessions.a[i], (i == 0) ? 0 : jobs.a[0],
+            execCmd(args + sessions.a[i], pgid,
                     pipes.a[i * 2], pipes.a[i * 2 + 1]);
         }
     }
