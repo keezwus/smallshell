@@ -75,6 +75,23 @@ int builtinCmd(char **args)
 
         return 1;
     }
+    if (!strcmp(args[0], "export"))
+    {
+        if (args[1] == NULL)
+        {
+            fprintf(stderr, "please provide path=value\n");
+            return 1;
+        }
+
+        char *name = strtok(args[1], "=");
+        char *value = strtok(NULL, "=");
+
+        if (setenv(name, value, 1) == -1)
+        {
+            perror("setenvErr");
+        }
+        return 1;
+    }
 
     if (strcmp(args[0], "&") == 0)
     {
@@ -95,7 +112,8 @@ int isBuiltinCmd(char **args)
         strcmp(args[0], "echo") == 0 ||
         strcmp(args[0], "kill") == 0 ||
         strcmp(args[0], "jobs") == 0 ||
-        strcmp(args[0], "&") == 0)
+        strcmp(args[0], "&") == 0 ||
+        strcmp(args[0], "export") == 0)
     {
         return 1;
     }
