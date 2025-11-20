@@ -2,12 +2,15 @@
 
 // global variable
 btrint jobs;
+sigset_t newMask, oldMask;
 
 int main()
 {
     setup_readline();
     btrintinit(&jobs);
     btrintadd(&jobs, 0); // placeholder for foreground process
+    sigemptyset(&newMask);
+    sigaddset(&newMask, SIGCHLD);
 
     if (signal(SIGINT, sigintHandler) == SIG_ERR)
         perror("signal error");
@@ -154,25 +157,25 @@ void eval(char **args)
             break;
         }
     }
-    jobs.a[0] = -1;
 
+    sigprocmask(SIG_BLOCK, &newMask, &oldMask);
     int pgid = pipeworks(args);
     if (bg)
     {
         btrintadd(&jobs, pgid);
+        sigprocmask(SIG_UNBLOCK, &newMask, &oldMask);
         return;
     }
     else
     {
-        if (waitpid(-pgid, NULL, 0) == -1)
-        {
-            perror("waitpidErr");
-        }
         jobs.a[0] = pgid;
+        while (waitpid(-pgid, NULL, 0) > 0)
+            ;
     }
+    sigprocmask(SIG_UNBLOCK, &newMask, &oldMask);
 }
 
-int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin, positive for forked pid
+int execCmd(char **args, int pgid, int inFd, int outFd) // pgid currently unused
 {
     if (isBuiltinCmd(args))
     {
@@ -207,9 +210,10 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
     }
 
     pid_t pid = fork();
+    setpgid(pid, pgid);
     if (pid == 0)
     {
-        setpgid(0, pgid); // set child process group id to the given pgid (0 if initializing)
+        sigprocmask(SIG_UNBLOCK, &newMask, &oldMask); // got to deal with mask even in child proces
 
         if (inFd != STDIN_FILENO)
         {
@@ -253,8 +257,6 @@ int pipeworks(char **args)
     btrintadd(&pipes, STDOUT_FILENO);
     int fd[2];
 
-    int pgid = 0;
-
     for (int i = 0; args[i] != NULL; i++)
     {
         if (!strcmp(args[i], "|"))
@@ -289,6 +291,8 @@ int pipeworks(char **args)
         return -1;
     }
 
+    int pgid = 0;
+
     for (int i = 0; i < sessions.c; i++)
     {
         if (i == 0)
@@ -302,6 +306,7 @@ int pipeworks(char **args)
                     pipes.a[i * 2], pipes.a[i * 2 + 1]);
         }
     }
+
     free(sessions.a);
     free(pipes.a);
     return pgid;

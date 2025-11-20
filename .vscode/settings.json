@@ -5,7 +5,10 @@
         "string.h": "c",
         "shellhead.h": "c",
         "betterarr.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "history.h": "c",
+        "stdlib.h": "c",
+        "stdio.h": "c"
     },
 
     "cmake.configureOnOpen": true,
