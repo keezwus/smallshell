@@ -7,10 +7,16 @@ sigset_t newMask, oldMask;
 int main()
 {
     setup_readline();
+
     btrintinit(&jobs);
     btrintadd(&jobs, 0); // placeholder for foreground process
+
     sigemptyset(&newMask);
     sigaddset(&newMask, SIGCHLD);
+
+    char *envpath = getenv("PATH");
+    char *path = betterstrcat(MYPATH, ":", envpath, NULL);
+    setenv("PATH", path, 1);
 
     if (signal(SIGINT, sigintHandler) == SIG_ERR)
         perror("signal error");
