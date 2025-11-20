@@ -213,8 +213,14 @@ int execCmd(char **args, int pgid, int inFd, int outFd) // return 0 for builtin,
             dup2(outFd, STDOUT_FILENO);
             close(outFd);
         }
-
-        execvp(args[0], args);
+        // i don know why but not doing this may cause problem
+        // oh,now i understand
+        // shit
+        if (execvp(args[0], args) < 0)
+        {
+            perror("ExecErr");
+            exit(EXIT_FAILURE);
+        }
     }
     else
     {
