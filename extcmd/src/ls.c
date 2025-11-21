@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-    int opt, flagL = 0;
+    int opt, flagL = 0, hasArg = 1;
     while ((opt = getopt(argc, argv, "l")) != -1)
     {
         switch (opt)
@@ -18,15 +18,23 @@ int main(int argc, char *argv[])
 
     DIR *dir;
     struct dirent *entry;
+    char cwd[SIZE];
 
-    if (optind > argc)
+    if (optind = argc)
     {
-        fprintf(stderr, PROMPT_RED "Usage: %s [-l] <directory_path>\n" PROMPT_RESET, argv[0]);
-        return EXIT_FAILURE;
+        hasArg = 0;
+        if (getcwd(cwd, sizeof(cwd)) == NULL)
+        {
+            perror("getCwdErr");
+        }
     }
-    else if (flagL)
+    if (flagL)
     {
-        dir = opendir(argv[optind]);
+        if (hasArg)
+            dir = opendir(argv[optind]);
+        else
+            dir = opendir(cwd);
+
         struct stat fileStat;
         if (dir == NULL)
         {
@@ -44,7 +52,11 @@ int main(int argc, char *argv[])
     }
     else
     {
-        dir = opendir(argv[optind]);
+        if (hasArg)
+            dir = opendir(argv[optind]);
+        else
+            dir = opendir(cwd);
+
         if (dir == NULL)
         {
             perror("opendir");
@@ -53,7 +65,7 @@ int main(int argc, char *argv[])
 
         while ((entry = readdir(dir)) != NULL)
         {
-            printf("%s", entry->d_name);
+            printf("%s ", entry->d_name);
         }
         printf("\n");
         closedir(dir);
