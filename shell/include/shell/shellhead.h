@@ -20,7 +20,7 @@
 #define PROMPT_YELLOW "\033[33m"
 #define PROMPT_RED "\033[31m"
 #define PROMPT_RESET "\033[0m"
-#define MYPATH "build/extcmd"
+#define MYPATH "/home/kevin/lprojects/shell/build/extcmd"
 
 // global variable
 extern btrint jobs;

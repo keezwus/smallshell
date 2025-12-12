@@ -17,6 +17,7 @@ int main()
     char *envpath = getenv("PATH");
     char *path = betterstrcat(MYPATH, ":", envpath, NULL);
     setenv("PATH", path, 1);
+    free(path);
 
     if (signal(SIGINT, sigintHandler) == SIG_ERR)
         perror("signal error");

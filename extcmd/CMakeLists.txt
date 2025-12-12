@@ -2,7 +2,7 @@
 set(EXTCMD ls)
 
 function(setExe name)
-    add_executable(${name} src/${name}.c)
+    add_executable(${name} src/${name}.cpp)
     target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 endfunction()
 
