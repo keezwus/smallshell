@@ -1,5 +1,4 @@
-#set(EXTCMD ls cat less xargs touch mkdir cp rm mv ln)
-set(EXTCMD ls)
+set(EXTCMD ls cat less xargs touch mkdir cp rm mv ln)
 
 function(setExe name)
     add_executable(${name} src/${name}.cpp)
