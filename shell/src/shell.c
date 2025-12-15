@@ -6,7 +6,7 @@ sigset_t newMask, oldMask;
 
 int main()
 {
-    setup_readline();
+    // setup_readline();
 
     btrintinit(&jobs);
     btrintadd(&jobs, 0); // placeholder for foreground process
@@ -176,8 +176,12 @@ void eval(char **args)
     else
     {
         jobs.a[0] = pgid;
+        tcsetpgrp(STDIN_FILENO, pgid);
         while (waitpid(-pgid, NULL, 0) > 0)
             ;
+        signal(SIGTTOU, SIG_IGN);
+        tcsetpgrp(STDIN_FILENO, getpid());
+        signal(SIGTTOU, SIG_DFL);
     }
     sigprocmask(SIG_UNBLOCK, &newMask, &oldMask);
 }
